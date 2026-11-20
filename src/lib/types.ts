@@ -1,3 +1,5 @@
+import type { Roadmap } from "./roadmap";
+
 export type ProjectType = "software" | "hardware" | "both";
 
 export interface Project {
@@ -6,6 +8,7 @@ export interface Project {
   description: string;
   type: ProjectType;
   created_at: string;
+  roadmap_json?: Roadmap | null;
   issues?: { count: number }[];
 }
 

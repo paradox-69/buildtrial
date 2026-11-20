@@ -7,7 +7,9 @@ import { createClient } from "../../../lib/supabase";
 import { useRequireUser } from "../../../lib/useRequireUser";
 import AppHeader from "../../../components/AppHeader";
 import ProjectForm, { ProjectValues } from "../../../components/ProjectForm";
+import RoadmapPanel from "../../../components/RoadmapPanel";
 import { Project, TYPE_LABEL, formatDate } from "../../../lib/types";
+import type { Roadmap } from "../../../lib/roadmap";
 import { btnGhost, line, muted, pill } from "../../../lib/ui";
 
 export default function ProjectPage() {
@@ -23,7 +25,7 @@ export default function ProjectPage() {
     if (!user) return;
     createClient()
       .from("projects")
-      .select("id, title, description, type, created_at")
+      .select("id, title, description, type, created_at, roadmap_json")
       .eq("id", id)
       .maybeSingle()
       .then(({ data }) => {
@@ -63,7 +65,7 @@ export default function ProjectPage() {
     );
   }
 
-  const soon: React.CSSProperties = { border: "1.5px dashed rgba(11,21,48,.3)", borderRadius: 14, padding: 24 };
+  const soon: React.CSSProperties = { border: "1.5px dashed rgba(11,21,48,.3)", borderRadius: 14, padding: 24, marginTop: 24 };
 
   return (
     <main style={{ maxWidth: 960, margin: "0 auto", padding: "32px 24px 80px" }}>
@@ -96,15 +98,16 @@ export default function ProjectPage() {
         </section>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginTop: 48 }}>
-        <div style={soon}>
-          <h3 style={{ fontSize: 20, fontWeight: 500, margin: "0 0 6px" }}>Smart Roadmap</h3>
-          <p style={{ margin: 0, color: muted, fontWeight: 300 }}>Coming next: generate milestones, a tech stack and a weekly plan from your idea.</p>
-        </div>
-        <div style={soon}>
-          <h3 style={{ fontSize: 20, fontWeight: 500, margin: "0 0 6px" }}>Issues (ReproLab)</h3>
-          <p style={{ margin: 0, color: muted, fontWeight: 300 }}>Coming after that: log bugs and failures, then verify the fixes.</p>
-        </div>
+      <RoadmapPanel
+        projectId={project.id}
+        initialIdea={project.description}
+        roadmap={project.roadmap_json ?? null}
+        onChange={(r: Roadmap) => setProject((p) => (p ? { ...p, roadmap_json: r } : p))}
+      />
+
+      <div style={soon}>
+        <h3 style={{ fontSize: 20, fontWeight: 500, margin: "0 0 6px" }}>Issues (ReproLab)</h3>
+        <p style={{ margin: 0, color: muted, fontWeight: 300 }}>Coming next: log bugs and failures, then verify the fixes.</p>
       </div>
     </main>
   );
